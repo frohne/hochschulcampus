@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="PlayMarker" size="0.150000 0.149372" />
+    <ImageTarget name="RecordMarker" size="0.150000 0.150628" />
+    <ImageTarget name="Target2" size="0.200000 0.303356" />
+    <ImageTarget name="Target1" size="0.200000 0.304583" />
+  </Tracking>
+</QCARConfig>
