@@ -13,8 +13,7 @@ public class ObjectScaling : MonoBehaviour
 {
     private GameObject selectedObject = null;
     public Slider sliderX = null;
-    public Slider sliderY = null;
-    public Slider sliderZ = null;
+    private Vector3 startScale;
 
 
     // Update is called once per frame
@@ -22,22 +21,17 @@ public class ObjectScaling : MonoBehaviour
     {
         if (selectedObject != null)
         {
-            selectedObject.transform.localScale = new Vector3(sliderX.value, sliderY.value, sliderZ.value);
-
+            selectedObject.transform.localScale = startScale * sliderX.value;
         }
     }
 
     public void setSelectedObject(GameObject obj)
     {
         selectedObject = obj;
-        sliderX.value = selectedObject.transform.localScale.x;
-        sliderX.maxValue = selectedObject.transform.position.x + 0.5f;
-
-        sliderY.value = selectedObject.transform.localScale.y;
-        sliderY.maxValue = selectedObject.transform.position.y + 0.5f;
-
-        sliderZ.value = selectedObject.transform.localScale.z;
-        sliderZ.maxValue = selectedObject.transform.position.z + 0.5f;
+        startScale = selectedObject.transform.localScale;
+        sliderX.value = 1;
+        sliderX.maxValue =  4;
+        
     }
 
     public void resetScale()
