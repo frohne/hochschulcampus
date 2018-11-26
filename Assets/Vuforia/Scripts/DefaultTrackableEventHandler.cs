@@ -1,6 +1,5 @@
 /*==============================================================================
 Copyright (c) 2017 PTC Inc. All Rights Reserved.
-
 Copyright (c) 2010-2014 Qualcomm Connected Experiences, Inc.
 All Rights Reserved.
 Confidential and Proprietary - Protected under copyright and other laws.
@@ -14,6 +13,7 @@ using System.Collections.Generic;
 using UnityEngine.Audio;
 using System.IO;
 using System;
+using UnityEditor;
 
 /// <summary>
 /// A custom handler that implements the ITrackableEventHandler interface.
@@ -32,15 +32,19 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     public AudioSource soundTarget;
     public AudioClip clipTarget;
-    private AudioSource[] allAudioSources;
+    //private AudioSource[] allAudioSources;
 
+    public int MemoLength = 10;
+    public string MemoName = "Memo";
+    public int MemoNumber = 1;
     public bool saving = false;
-    public bool useMicrophone;
+    public bool useMicrophone = true;
     public AudioClip audioClip;
     public AudioSource newAudioSource;
     public string selectedDevice;
     const int HEADER_SIZE = 44;
 
+    /*
     void StopAllAudio()
     {
         allAudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
@@ -49,9 +53,11 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             audioS.Stop();
         }
     }
+    */
 
     void playSound(string ss)
     {
+        AssetDatabase.Refresh();
         clipTarget = (AudioClip)Resources.Load(ss);
         soundTarget.clip = clipTarget;
         soundTarget.loop = false;
@@ -63,13 +69,15 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
     {
         if (useMicrophone)
         {
-            if (Microphone.devices.Length > 0)
+            if (Microphone.devices.Length > 0) // Wenn min. 1 Mikrofon vorhanden ist
             {
-                selectedDevice = Microphone.devices[0].ToString();
+                Debug.Log("Recording...");
+                selectedDevice = Microphone.devices[0].ToString();  // Erstes Mikrofon in der Liste wird genutzt
 
                 newAudioSource = GetComponent<AudioSource>();
-                newAudioSource.clip = Microphone.Start(selectedDevice, true, 10, AudioSettings.outputSampleRate);
-                newAudioSource.Play();
+                newAudioSource.clip = Microphone.Start(selectedDevice, false, MemoLength, AudioSettings.outputSampleRate);
+                                                      //Ausgewähltes Mikrofon, loop, Länge der Aufname in Sekunden, Frequenz
+                //newAudioSource.Play();
 
                 saving = true;
             }
@@ -80,7 +88,20 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         }
         else
         {
-            playSound("sound/AudioTest1");
+            //playSound("sound/AudioTest1");
+        }
+    }
+    
+    void deleteAudio(string filename)
+    {
+        var filepath = Path.Combine(Application.dataPath, "Resources");
+        filepath = Path.Combine(filepath, "Memos");
+        filepath = Path.Combine(filepath, filename);
+
+        if (File.Exists(filepath))
+        {
+            File.Delete(filepath);
+            Debug.Log("Delete " + filename);
         }
     }
 
@@ -94,11 +115,24 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
             audioClip = newAudioSource.clip;
 
-            string filename = "Test.wav";
-            // var filepath = Path.Combine(Application.persistentDataPath, filename);
-            var filepath = Path.Combine(Application.dataPath, "Resources");
-            filepath = Path.Combine(filepath, "Memos");
-            filepath = Path.Combine(filepath, filename);
+            string filename;           
+            var path = Path.Combine(Application.dataPath, "Resources");
+            path = Path.Combine(path, "Memos"); //Speichern unter: Assets\Resources\Memos
+            var filepath = "";
+
+
+            do
+            {
+                filename = MemoName + MemoNumber + ".wav";
+                filepath = Path.Combine(path, filename);
+
+                MemoNumber++;
+
+            } while (File.Exists(filepath));
+
+            MemoNumber = 1;
+
+
             Debug.Log("Datei wird gespeichert unter : " + filepath);
 
             // Make sure directory exists if user is saving to sub dir.
@@ -107,7 +141,6 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             using (var fileStream = CreateEmpty(filepath))
             {
                 ConvertAndWrite(fileStream, audioClip);
-
                 WriteHeader(fileStream, audioClip);
             }
 
@@ -246,27 +279,29 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         m_NewStatus = newStatus;
 
         if (newStatus == TrackableBehaviour.Status.DETECTED ||
-            newStatus == TrackableBehaviour.Status.TRACKED ||
-            newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
+            newStatus == TrackableBehaviour.Status.TRACKED || newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
         {
+            /*
             if (mTrackableBehaviour.TrackableName == "Target1")
             {
                 saveAudio();
             }
-
+            */
             Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
-            OnTrackingFound();                       
+            OnTrackingFound();
         }
         else if (previousStatus == TrackableBehaviour.Status.TRACKED &&
                  newStatus == TrackableBehaviour.Status.NO_POSE)
         {
+            Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
+
+
             if (mTrackableBehaviour.TrackableName == "Target1")
             {
                 saveAudio();
             }
 
-            Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
-            OnTrackingLost();            
+            OnTrackingLost();
         }
         else
         {
@@ -274,12 +309,6 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             // Vuforia is starting, but tracking has not been lost or found yet
             // Call OnTrackingLost() to hide the augmentations
             OnTrackingLost();
-            /*
-            if (mTrackableBehaviour.TrackableName == "Target1")
-            {
-                saveAudio();
-            }
-            */
         }
     }
 
@@ -307,14 +336,20 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
         if (mTrackableBehaviour.TrackableName == "Target1")
         {
-            //playSound("sound/AudioTest1");
             createAudio();
         }
 
         if (mTrackableBehaviour.TrackableName == "Target2")
+        {            
+            Debug.Log("Play " + MemoName + MemoNumber);
+            playSound("Memos/" + MemoName + MemoNumber);
+            //Problem: Wenn Audio gerade erst gespeichert wurde, kann es noch nicht abgespielt werden
+        }
+
+        if (mTrackableBehaviour.TrackableName == "Target3")
         {
-            playSound("Memos/Test");
-            //newAudioSource.Play();
+            string filename = MemoName + MemoNumber + ".wav";
+            deleteAudio(filename);
         }
     }
 
