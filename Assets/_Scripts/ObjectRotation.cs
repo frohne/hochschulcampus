@@ -16,14 +16,32 @@ public class ObjectRotation : MonoBehaviour
     public Slider sliderX = null;
     public Slider sliderY = null;
     public Slider sliderZ = null;
+
+    private Vector3 lastRot;
+    public GameObject networkRole;
 	
 	// Update is called once per frame
 	void Update ()
     {
         if(selectedObject != null)
         {
-            selectedObject.transform.rotation = Quaternion.Euler(sliderX.value, sliderY.value, sliderZ.value);
+            Vector3 rot = selectedObject.transform.rotation.eulerAngles;
 
+            //if someone else has change the rotation of my selected Object 
+            //=> adapt Slider Values
+            if (rot != lastRot)
+            {
+                setSelectedObject(selectedObject);
+            }
+
+            selectedObject.transform.rotation = Quaternion.Euler(sliderX.value, sliderY.value, sliderZ.value);
+            lastRot = selectedObject.transform.rotation.eulerAngles;
+
+            if (rot != selectedObject.transform.rotation.eulerAngles)
+            {
+                //Tell Server to Update Rotation
+                networkRole.GetComponent<NetworkController>().rotationUpdate(selectedObject);
+            }
         }
     }
 
@@ -42,5 +60,6 @@ public class ObjectRotation : MonoBehaviour
     {
         selectedObject.transform.rotation = Quaternion.Euler(selectedObject.GetComponent<RootSettings>().getRootScaling());
         setSelectedObject(selectedObject);
+        networkRole.GetComponent<NetworkController>().rotationUpdate(selectedObject);
     }
 }
