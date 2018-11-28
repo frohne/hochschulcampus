@@ -9,33 +9,51 @@ public class ScrollLayers : MonoBehaviour {
     public ScrollRect scrollView;
     public GameObject scrollContent;
     public GameObject scrollItemLayer;
-    public GameObject layerObject;
+   
+ GameObject layerObject;
+    
      
     string[] layernames;
     public TextMeshProUGUI objectName;
+    public GameObject objectToggle;
     int count;
    
 	// Use this for initialization
 	void Start () {
         //layernames = layerObject.GetComponentsInChildren<GameObject>().name;
-        objectName.text = layerObject.name;
-        count = layerObject.GetComponent<Transform>().childCount;
+
+        //generateLayer(layerObject);
+        
+        
+        
+
+    }
+    public void generateLayer(GameObject currentObject)
+    {
        
-        
-     
+        Toggle toggle = objectToggle.GetComponent<Toggle>();
+        toggle.onValueChanged.RemoveAllListeners();
+        toggle.onValueChanged.AddListener(delegate { ToggleValueChanged(currentObject); });
 
-        for(int i = 0; i < count; i++)
+
+        foreach (Transform g in scrollContent.transform)
         {
-
-            generateLayerItem(i);
+            Destroy(g.gameObject);
         }
-           
-        
-        print(layerObject.GetComponent<Transform>().GetChild(0).name);
-        print(layerObject.GetComponent<Transform>().GetChild(1).name);
-        
-        
+        objectName.text = currentObject.name;
+        count = currentObject.GetComponent<Transform>().childCount;
 
+
+        if (count > 0)
+        {
+            for (int i = 0; i < count; i++)
+            {
+
+                generateLayerItem(i,currentObject);
+            }
+        }
+
+        
     }
 	
 	// Update is called once per frame
@@ -43,23 +61,23 @@ public class ScrollLayers : MonoBehaviour {
 		
 	}
 
-    void generateLayerItem(int i)
+    void generateLayerItem(int i, GameObject currentObject)
     {
         GameObject scrollItemLayerObj = Instantiate(scrollItemLayer);
         scrollItemLayerObj.transform.SetParent(scrollContent.transform, false);
-        scrollItemLayerObj.GetComponentInChildren<TextMeshProUGUI>().text = layerObject.GetComponent<Transform>().GetChild(i).name;
-        GameObject go = layerObject.GetComponent<Transform>().GetChild(i).gameObject;
+        scrollItemLayerObj.GetComponentInChildren<TextMeshProUGUI>().text = currentObject.GetComponent<Transform>().GetChild(i).name;
+        GameObject go = currentObject.GetComponent<Transform>().GetChild(i).gameObject;
 
         Toggle toggle = scrollItemLayerObj.GetComponent<Toggle>();
-        toggle.onValueChanged.AddListener(delegate { ToggleValueChanged(toggle,go); });
+        toggle.onValueChanged.AddListener(delegate { ToggleValueChanged(go); });
 
 
 
     }
 
-    void ToggleValueChanged(Toggle toggle, GameObject gameObject)
+    void ToggleValueChanged(GameObject gameObject)
     {
-        if (gameObject.active)
+        if (gameObject.activeSelf)
         {
             gameObject.SetActive(false);
         }
@@ -70,6 +88,13 @@ public class ScrollLayers : MonoBehaviour {
        
 
     }
+
+    public void DisableGameObjects(GameObject gameObject)
+    {
+        gameObject.SetActive(false);
+    }
+
+   
 
    
 }
