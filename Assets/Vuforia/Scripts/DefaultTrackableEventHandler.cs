@@ -55,14 +55,58 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
     }
     */
 
-    void playSound(string ss)
+
+    void playSound(string filename)
     {
+        //Android
+        var filepath = Application.persistentDataPath;
+        if (!System.IO.File.Exists(filepath + "/" + filename + ".wav"))
+        {
+            Debug.Log("Data Path existiert nicht!!!");
+        }
+        else
+        {
+            Debug.Log("Data Path existiert");
+        }
+
+        WWW www = new WWW("file://" + filepath + "/" + filename + ".wav");
+
+
+        clipTarget = www.GetAudioClip(true, true);
+
+        //PC
+        /*
         AssetDatabase.Refresh();
         clipTarget = (AudioClip)Resources.Load(ss);
+        */
         soundTarget.clip = clipTarget;
         soundTarget.loop = false;
         soundTarget.playOnAwake = false;
         soundTarget.Play();
+
+    }
+
+    void deleteAudio(string filename)
+    {
+        //Android
+        var filepath = Application.persistentDataPath;
+
+        //PC
+        //var filepath = Path.Combine(Application.dataPath, "Resources");
+        //filepath = Path.Combine(filepath, "Memos");
+        filepath = Path.Combine(filepath, filename + ".wav");
+
+        Debug.Log("Delete Path " + filepath);
+
+        if (File.Exists(filepath))
+        {
+            File.Delete(filepath);
+            Debug.Log("Delete " + filename);
+        }
+        else
+        {
+            Debug.Log("File konnte nicht gelöscht werden.");
+        }
     }
 
     void createAudio()
@@ -76,8 +120,8 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
                 newAudioSource = GetComponent<AudioSource>();
                 newAudioSource.clip = Microphone.Start(selectedDevice, false, MemoLength, AudioSettings.outputSampleRate);
-                                                      //Ausgewähltes Mikrofon, loop, Länge der Aufname in Sekunden, Frequenz
-                //newAudioSource.Play();
+                //Ausgewähltes Mikrofon, loop, Länge der Aufname in Sekunden, Frequenz
+                newAudioSource.Play();
 
                 saving = true;
             }
@@ -91,19 +135,8 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             //playSound("sound/AudioTest1");
         }
     }
-    
-    void deleteAudio(string filename)
-    {
-        var filepath = Path.Combine(Application.dataPath, "Resources");
-        filepath = Path.Combine(filepath, "Memos");
-        filepath = Path.Combine(filepath, filename);
 
-        if (File.Exists(filepath))
-        {
-            File.Delete(filepath);
-            Debug.Log("Delete " + filename);
-        }
-    }
+
 
     void saveAudio()
     {
@@ -115,11 +148,17 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
             audioClip = newAudioSource.clip;
 
-            string filename;           
-            var path = Path.Combine(Application.dataPath, "Resources");
-            path = Path.Combine(path, "Memos"); //Speichern unter: Assets\Resources\Memos
-            var filepath = "";
+            string filename;
 
+            //Android
+            var path = Application.persistentDataPath; //Speichern unter: Android\data\com.Company.HSHL2030\files
+
+            //PC
+            //var path = Path.Combine(Application.dataPath, "Resources");
+            //path = Path.Combine(path, "Memos"); //Speichern unter: Assets\Resources\Memos
+
+
+            var filepath = "";
 
             do
             {
@@ -128,6 +167,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
                 MemoNumber++;
 
+                Debug.Log(filepath + " bereits vorhanden?");
             } while (File.Exists(filepath));
 
             MemoNumber = 1;
@@ -145,6 +185,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
             }
 
             saving = false;
+            Debug.Log("Save end");
         }
     }
 
@@ -340,15 +381,15 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         }
 
         if (mTrackableBehaviour.TrackableName == "Target2")
-        {            
+        {
             Debug.Log("Play " + MemoName + MemoNumber);
-            playSound("Memos/" + MemoName + MemoNumber);
-            //Problem: Wenn Audio gerade erst gespeichert wurde, kann es noch nicht abgespielt werden
+            //playSound("Memos/" + MemoName + MemoNumber);//PC
+            playSound(MemoName + MemoNumber);//Android
         }
 
         if (mTrackableBehaviour.TrackableName == "Target3")
         {
-            string filename = MemoName + MemoNumber + ".wav";
+            string filename = MemoName + MemoNumber;
             deleteAudio(filename);
         }
     }
