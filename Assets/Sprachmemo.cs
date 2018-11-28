@@ -26,19 +26,20 @@ public class Sprachmemo : MonoBehaviour
     const int HEADER_SIZE = 44;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-		
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        soundTarget = (AudioSource)gameObject.AddComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update()
     {
-		
-	}
+
+    }
 
     public void playSound(string filename)
     {
+        Debug.Log("Play Audio " + filename);
         //Android
         /*
         var filepath = Application.persistentDataPath;
@@ -55,10 +56,10 @@ public class Sprachmemo : MonoBehaviour
         clipTarget = www.GetAudioClip(true, true);
         */
         //PC
-        
+
         AssetDatabase.Refresh();
         clipTarget = (AudioClip)Resources.Load("Memos/" + filename);
-        
+
         soundTarget.clip = clipTarget;
         soundTarget.loop = false;
         soundTarget.playOnAwake = false;
@@ -92,12 +93,22 @@ public class Sprachmemo : MonoBehaviour
         }
     }
 
-    public void DeleteAll()
+    public void deleteAll()
     {
-        for(int i=1; i < MemoNumber; i++)
+        for (int i = 1; i < MemoNumber; i++)
         {
-            deleteAudio(MemoName+i);
+            deleteAudio(MemoName + i);
         }
+        MemoNumber = 1;
+
+        foreach (Transform child in scrollContent)
+        {
+            if (child.name.StartsWith("Abspielen"))
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+        }
+
     }
 
     public void createAudio()
@@ -108,29 +119,29 @@ public class Sprachmemo : MonoBehaviour
         //}
         //else
         //{
-            if (useMicrophone)
+        if (useMicrophone)
+        {
+            if (Microphone.devices.Length > 0) // Wenn min. 1 Mikrofon vorhanden ist
             {
-                if (Microphone.devices.Length > 0) // Wenn min. 1 Mikrofon vorhanden ist
-                {
-                    Debug.Log("Recording...");
-                    selectedDevice = Microphone.devices[0].ToString();  // Erstes Mikrofon in der Liste wird genutzt
+                Debug.Log("Recording...");
+                selectedDevice = Microphone.devices[0].ToString();  // Erstes Mikrofon in der Liste wird genutzt
 
-                    newAudioSource = GetComponent<AudioSource>();
-                    newAudioSource.clip = Microphone.Start(selectedDevice, false, MemoLength, AudioSettings.outputSampleRate);
-                    //Ausgewähltes Mikrofon, loop, Länge der Aufname in Sekunden, Frequenz
-                    //newAudioSource.Play();
+                newAudioSource = GetComponent<AudioSource>();
+                newAudioSource.clip = Microphone.Start(selectedDevice, false, MemoLength, AudioSettings.outputSampleRate);
+                //Ausgewähltes Mikrofon, loop, Länge der Aufname in Sekunden, Frequenz
+                //newAudioSource.Play();
 
-                    saving = true;
-                }
-                else
-                {
-                    useMicrophone = false;
-                }
+                saving = true;
             }
             else
             {
-                //playSound("sound/AudioTest1");
+                useMicrophone = false;
             }
+        }
+        else
+        {
+            //playSound("sound/AudioTest1");
+        }
         //}
     }
 
@@ -288,7 +299,7 @@ public class Sprachmemo : MonoBehaviour
     void generateLayerItem(int i)
     {
         GameObject scrollItemLayerObj = Instantiate(scrollItemLayer);
-        scrollItemLayerObj.transform.position = new Vector3(-25.0f, -25.0f + ((i- 1) * 150), 0.0f);
+        scrollItemLayerObj.transform.position = new Vector3(50.0f, -25.0f + ((i - 1) * 188.38f), 0.0f);
         scrollItemLayerObj.transform.SetParent(scrollContent.transform, false);
         scrollItemLayerObj.GetComponent<Button>().onClick.AddListener(() => playSound(MemoName + i));
         Debug.Log(i);
@@ -298,8 +309,5 @@ public class Sprachmemo : MonoBehaviour
 
         //Toggle toggle = scrollItemLayerObj.GetComponent<Toggle>();
         //toggle.onValueChanged.AddListener(delegate { ToggleValueChanged(go); });
-
-
-
     }
 }
