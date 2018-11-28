@@ -269,6 +269,50 @@ ModelImporter:
     4300082: siege02
     4300084: siege03
     4300086: table
+    6400000: Box01
+    6400002: Box02
+    6400004: Box03
+    6400006: Box04
+    6400008: Box05
+    6400010: Box06
+    6400012: Box07
+    6400014: Box08
+    6400016: Box09
+    6400018: Box10
+    6400020: Box11
+    6400022: Box12
+    6400024: Box13
+    6400026: Box14
+    6400028: Box15
+    6400030: Box16
+    6400032: Box17
+    6400034: Box18
+    6400036: Box19
+    6400038: Box20
+    6400040: Box21
+    6400042: Box22
+    6400044: Box23
+    6400046: Box24
+    6400048: Box25
+    6400050: Box26
+    6400052: Box27
+    6400054: Box28
+    6400056: Box29
+    6400058: Box30
+    6400060: Box31
+    6400062: Box32
+    6400064: pied
+    6400066: pied01
+    6400068: pied02
+    6400070: pied03
+    6400072: pied04
+    6400074: pied05
+    6400076: pied06
+    6400078: siege
+    6400080: siege01
+    6400082: siege02
+    6400084: siege03
+    6400086: table
     2186277476908879412: ImportLogs
   externalObjects: {}
   materials:
@@ -303,7 +347,7 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1

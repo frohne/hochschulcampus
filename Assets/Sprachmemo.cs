@@ -41,7 +41,7 @@ public class Sprachmemo : MonoBehaviour
     {
         Debug.Log("Play Audio " + filename);
         //Android
-        /*
+        
         var filepath = Application.persistentDataPath;
         if (!System.IO.File.Exists(filepath + "/" + filename + ".wav"))
         {
@@ -54,11 +54,11 @@ public class Sprachmemo : MonoBehaviour
 
         WWW www = new WWW("file://" + filepath + "/" + filename + ".wav");
         clipTarget = www.GetAudioClip(true, true);
-        */
+        
         //PC
-
+        /*
         AssetDatabase.Refresh();
-        clipTarget = (AudioClip)Resources.Load("Memos/" + filename);
+        clipTarget = (AudioClip)Resources.Load("Memos/" + filename);*/
 
         soundTarget.clip = clipTarget;
         soundTarget.loop = false;
@@ -70,11 +70,11 @@ public class Sprachmemo : MonoBehaviour
     public void deleteAudio(string filename)
     {
         //Android
-        //var filepath = Application.persistentDataPath;
+        var filepath = Application.persistentDataPath;
 
         //PC
-        var filepath = Path.Combine(Application.dataPath, "Resources");
-        filepath = Path.Combine(filepath, "Memos");
+        /*var filepath = Path.Combine(Application.dataPath, "Resources");
+        filepath = Path.Combine(filepath, "Memos");*/
 
 
 
@@ -158,11 +158,11 @@ public class Sprachmemo : MonoBehaviour
             string filename;
 
             //Android
-            //var path = Application.persistentDataPath; //Speichern unter: Android\data\com.Company.HSHL2030\files
+            var path = Application.persistentDataPath; //Speichern unter: Android\data\com.Company.HSHL2030\files
 
             //PC
-            var path = Path.Combine(Application.dataPath, "Resources");
-            path = Path.Combine(path, "Memos"); //Speichern unter: Assets\Resources\Memos
+            /*var path = Path.Combine(Application.dataPath, "Resources");
+            path = Path.Combine(path, "Memos"); //Speichern unter: Assets\Resources\Memos*/
 
 
             var filepath = "";
