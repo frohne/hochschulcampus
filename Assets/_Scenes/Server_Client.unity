@@ -866,6 +866,7 @@ GameObject:
   - component: {fileID: 94632606}
   - component: {fileID: 94632605}
   - component: {fileID: 94632610}
+  - component: {fileID: 94632611}
   m_Layer: 0
   m_Name: ARCamera
   m_TagString: MainCamera
@@ -973,6 +974,18 @@ MonoBehaviour:
   translationUI: {fileID: 137197179}
   rotationUI: {fileID: 1012879416}
   scalingUI: {fileID: 1545932216}
+--- !u!114 &94632611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 94632604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97e1ac907d0635c40bcb8841eba0ed3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkRole: {fileID: 206943701}
 --- !u!1 &137197179
 GameObject:
   m_ObjectHideFlags: 0
@@ -4213,6 +4226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitSpriteAdd: {fileID: 1701841916}
   inactiveLaser: {fileID: 1827308680}
+  networkRole: {fileID: 206943701}
 --- !u!212 &727843358
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ public class ServerClient
 {
     public int connectionId;
     public string userName;
-    public Vector3 position;
+    public GameObject avatar;
 }
 
 public class Server : MonoBehaviour
@@ -54,6 +54,7 @@ public class Server : MonoBehaviour
         ServerClient hostsc = new ServerClient();
         hostsc.connectionId = 0;
         hostsc.userName = userName;
+        hostsc.avatar = new GameObject();//GameObject.CreatePrimitive(PrimitiveType.Cylinder); 
         clients.Add(hostsc);
 
         NetworkTransport.Init();
@@ -109,11 +110,12 @@ public class Server : MonoBehaviour
 
                         
                     case "MYPOSITION":
-                        //Not called yet
                         //Update a users position
-                        OnMyPosition(connectionId, float.Parse(splitData[1]), float.Parse(splitData[2]), float.Parse(splitData[3]));
+                        OnMyPosition(connectionId, float.Parse(splitData[1]), float.Parse(splitData[2]), float.Parse(splitData[3]), float.Parse(splitData[4]), float.Parse(splitData[5]), float.Parse(splitData[6]));
                         break;
 
+
+                        //OBJECT PARAMETER
                     case "POSITIONUPDATE":
                         OnPositionUpdate(connectionId, splitData[1], float.Parse(splitData[2]), float.Parse(splitData[3]), float.Parse(splitData[4]));
                         break;
@@ -139,7 +141,7 @@ public class Server : MonoBehaviour
                 break;
         }
         //Ask User for their Position
-        /*
+        
         if(Time.time - lastPositionUpdate > positionUpdateRate)
         {
             lastPositionUpdate = Time.time;
@@ -147,18 +149,20 @@ public class Server : MonoBehaviour
             string m = "ASKPOSITION|";
             foreach(ServerClient sc in clients)
             {
-                m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.y.ToString() + '%' + sc.position.z.ToString() + '|';
+                m += sc.connectionId.ToString() + '%' + sc.avatar.transform.position.x.ToString() + '%' + sc.avatar.transform.position.y.ToString() + '%' + sc.avatar.transform.position.z.ToString() + '%' + sc.avatar.transform.rotation.eulerAngles.x.ToString() + '%' + sc.avatar.transform.rotation.eulerAngles.y.ToString() + '%' + sc.avatar.transform.rotation.eulerAngles.z.ToString() + '|';
             }
             m = m.Trim('|');
             Send(m, unreliableChannel, clients);
         }
-        */
+        /**/
     }
     private void OnConnection(int cnnId)
     {
         ServerClient c = new ServerClient();
         c.connectionId = cnnId;
         c.userName = "TEMP";
+        c.avatar = new GameObject();//GameObject.CreatePrimitive(PrimitiveType.Capsule); 
+        c.avatar.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
 
         clients.Add(c);
 
@@ -190,10 +194,17 @@ public class Server : MonoBehaviour
         Send("CNN|" + userName + "|" + cnnId, reliableChannel, clients);
     }
 
-    private void OnMyPosition(int cnnId, float x, float y, float z)
+
+    //Set new Position of a soezific User-Avatar
+    private void OnMyPosition(int cnnId, float x, float y, float z, float a, float b, float c)
     {
-        clients.Find(a => a.connectionId == cnnId).position = new Vector3(x, y, z);
+        ServerClient sc = clients.Find(n => n.connectionId == cnnId);
+        sc.avatar.transform.position = new Vector3(x, y, z);
+        sc.avatar.transform.rotation = Quaternion.Euler(a, b, c);
     }
+
+
+
 
     /****************** HANDLE POS, ROT AND SCALE UPDATE ***********************/
     //get and send changed POSITION
@@ -250,6 +261,12 @@ public class Server : MonoBehaviour
         scalingUpdate(GameObject.Find(objectname), scList);
     }
 
+
+
+
+
+
+
     /**********  SEND POS, ROT AND SCALE UPDATE**************/
     //send the new POSITION of an Object
     public void positionUpdate(GameObject go)
@@ -293,6 +310,16 @@ public class Server : MonoBehaviour
         Send(msg, reliableChannel, scList);
     }
 
+
+
+
+    //Update My AVATAR Position
+    public void updateAvatar(GameObject go)
+    {
+        ServerClient sc = clients.Find(x => x.connectionId == 0);
+        sc.avatar.transform.position = go.transform.position;
+        sc.avatar.transform.rotation = Quaternion.Euler(go.transform.rotation.eulerAngles);
+    }
 
 
 

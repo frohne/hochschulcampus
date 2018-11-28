@@ -9,6 +9,7 @@ public class LaserPoint : MonoBehaviour {
     public SpriteRenderer hitSpriteAdd;
     private bool toggle;
     public SpriteRenderer inactiveLaser;
+    public GameObject networkRole;
 
     // Use this for initialization
     void Start()
@@ -29,6 +30,9 @@ public class LaserPoint : MonoBehaviour {
             hitSprite.enabled = false;
             hitSpriteAdd.enabled = false;
             inactiveLaser.enabled = false;
+
+
+            networkRole.GetComponent<NetworkController>().laser(true);
         }
         else
         {
@@ -37,6 +41,7 @@ public class LaserPoint : MonoBehaviour {
             hitSpriteAdd.enabled = false;
             inactiveLaser.enabled = true;
             inactiveLaser.transform.position = arCam.transform.position + arCam.transform.forward.normalized * 1f;
+            networkRole.GetComponent<NetworkController>().laser(false);
         }
     }
 

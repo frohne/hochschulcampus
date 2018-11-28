@@ -41,7 +41,6 @@ public class Client : MonoBehaviour
     private string userName;
     private string connectionIp;    //"192.168.112.206" 192.168.43.48
 
-    //public GameObject playerPrefab;
     public List<User> users = new List<User>();
 
     public void Connect()
@@ -106,7 +105,7 @@ public class Client : MonoBehaviour
         {
             case NetworkEventType.DataEvent:
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                debugOutput.text = "received:" + msg;
+                //debugOutput.text = "received:" + msg;
                 Debug.Log(msg);
                 string[] splitData = msg.Split('|');
 
@@ -128,7 +127,6 @@ public class Client : MonoBehaviour
                         break;
 
                     case "AKSPOSITION":
-                        //not called yet
                         OnAskPosition(splitData);
                         break;
 
@@ -191,13 +189,16 @@ public class Client : MonoBehaviour
                 position.x = float.Parse(d[1]);
                 position.y = float.Parse(d[2]);
                 position.z = float.Parse(d[3]);
+                debugOutput.text = position.x.ToString() + " " + position.y.ToString() + " " + position.z.ToString();
                 users[int.Parse(d[0])].avatar.transform.position = position;
+                users[int.Parse(d[0])].avatar.transform.rotation = Quaternion.Euler(float.Parse(d[4]), float.Parse(d[5]), float.Parse(d[6]));
             }
         }
 
         //Send my Position
         Vector3 myPosition = users.Find(x => x.connectionId == ourClientId).avatar.transform.position;
-        string msg = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString() + '|' + myPosition.z.ToString();
+        Vector3 myRotation = users.Find(x => x.connectionId == ourClientId).avatar.transform.rotation.eulerAngles;
+        string msg = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.y.ToString() + '|' + myPosition.z.ToString() + '|' + myRotation.x.ToString() + '|' + myRotation.y.ToString() + '|' + myRotation.z.ToString();
         Send(msg, unreliableChannel);
     }
 
@@ -205,12 +206,16 @@ public class Client : MonoBehaviour
     private void CreateOtherUser (string userName, int cnnId)
     {
         //showing other user as GameObject?
-        //GameObject go = Instantiate.(playerPrefab) as GameObject;
-
+        GameObject go = new GameObject();//GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        go.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
         User u = new User();
         u.userName = userName;
         u.connectionId = cnnId;
-        //u.avatar = go;
+
+        if (cnnId != ourClientId)
+            u.avatar = go;//new GameObject();
+        else
+            u.avatar = new GameObject();
 
         //add User to User List
         users.Add(u);
@@ -273,6 +278,15 @@ public class Client : MonoBehaviour
     {
         GameObject.Find(objectname).transform.localScale = new Vector3(x, y, z);
     }
+
+    //Update My AVATAR Position
+    public void updateAvatar (GameObject go)
+    {
+        User u = users.Find(x => x.connectionId == ourClientId);
+        u.avatar.transform.position = go.transform.position;
+        u.avatar.transform.rotation = Quaternion.Euler(go.transform.rotation.eulerAngles);
+    }
+
     //Send a  massege to the server
     private void Send(string massage, int channelId)
     {

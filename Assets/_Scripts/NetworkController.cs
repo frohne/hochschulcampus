@@ -30,4 +30,22 @@ public class NetworkController : MonoBehaviour {
         else if (Server.GetComponent<Server>().getIsStarted())
             Server.GetComponent<Server>().scalingUpdate(go);
     }
+
+    public void laserUpdate(GameObject go)
+    {
+        if (Client.GetComponent<Client>().getIsStarted())
+            Client.GetComponent<Client>().updateAvatar(go);
+        else if (Server.GetComponent<Server>().getIsStarted())
+            Server.GetComponent<Server>().updateAvatar(go);
+    }
+
+    public void laser(bool on)
+    {
+        /*
+        if (Client.GetComponent<Client>().getIsStarted())
+            //Client.GetComponent<Client>().laser(on);
+        else if (Server.GetComponent<Server>().getIsStarted())
+            //Server.GetComponent<Server>().laser(on);
+        */
+    }
 }
