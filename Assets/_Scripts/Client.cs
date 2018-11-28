@@ -19,7 +19,7 @@ public class Client : MonoBehaviour
     public Button connectButton;
     public Button disconnectButton;
     public Text connectionInfo;
-
+    public GameObject prefab; 
     private const int MAX_CONNECTIONS = 30;
 
     private int port = 5839;
@@ -126,7 +126,7 @@ public class Client : MonoBehaviour
                         UserDisconnected(int.Parse(splitData[1]));
                         break;
 
-                    case "AKSPOSITION":
+                    case "ASKPOSITION":
                         OnAskPosition(splitData);
                         break;
 
@@ -190,8 +190,10 @@ public class Client : MonoBehaviour
                 position.y = float.Parse(d[2]);
                 position.z = float.Parse(d[3]);
                 debugOutput.text = position.x.ToString() + " " + position.y.ToString() + " " + position.z.ToString();
-                users[int.Parse(d[0])].avatar.transform.position = position;
-                users[int.Parse(d[0])].avatar.transform.rotation = Quaternion.Euler(float.Parse(d[4]), float.Parse(d[5]), float.Parse(d[6]));
+                users.Find(x => x.connectionId == int.Parse(d[0])).avatar.transform.position = position;
+                users.Find(x => x.connectionId == int.Parse(d[0])).avatar.transform.rotation = Quaternion.Euler(float.Parse(d[4]), float.Parse(d[5]), float.Parse(d[6]));
+                //users[int.Parse(d[0])].avatar.transform.position = position;
+                //users[int.Parse(d[0])].avatar.transform.rotation = Quaternion.Euler(float.Parse(d[4]), float.Parse(d[5]), float.Parse(d[6]));
             }
         }
 
@@ -206,14 +208,18 @@ public class Client : MonoBehaviour
     private void CreateOtherUser (string userName, int cnnId)
     {
         //showing other user as GameObject?
-        GameObject go = new GameObject();//GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        go.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+        
         User u = new User();
         u.userName = userName;
         u.connectionId = cnnId;
 
         if (cnnId != ourClientId)
+        {
+            GameObject go = Instantiate(prefab);//new GameObject();
             u.avatar = go;//new GameObject();
+            
+            go.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        }
         else
             u.avatar = new GameObject();
 

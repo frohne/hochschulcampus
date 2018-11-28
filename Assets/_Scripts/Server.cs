@@ -161,7 +161,7 @@ public class Server : MonoBehaviour
         ServerClient c = new ServerClient();
         c.connectionId = cnnId;
         c.userName = "TEMP";
-        c.avatar = new GameObject();//GameObject.CreatePrimitive(PrimitiveType.Capsule); 
+        c.avatar = GameObject.CreatePrimitive(PrimitiveType.Capsule);//new GameObject(); 
         c.avatar.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
 
         clients.Add(c);
