@@ -19,7 +19,14 @@ public class RootSettings : MonoBehaviour {
         position = this.transform.position;
         rotation = this.transform.rotation.eulerAngles;
         scaling = this.transform.localScale;
-	}
+
+        if(MemberController.IsServer)
+        {
+            //dings.AddObjectToSyncObjectList(this.gameObject)
+        }
+
+
+    }
 	
 	
     public Vector3 getRootPosition ()

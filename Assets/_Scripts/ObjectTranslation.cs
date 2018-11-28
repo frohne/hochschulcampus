@@ -15,14 +15,32 @@ public class ObjectTranslation : MonoBehaviour
     public Slider sliderX = null;
     public Slider sliderY = null;
     public Slider sliderZ = null;
+
+    private Vector3 lastpos;
 	
 	// Update is called once per frame
 	void Update ()
     {
-		if(selectedObject != null)
+
+        if (selectedObject != null)
         {
+            Vector3 pos = selectedObject.transform.position;
+
+            //Check if someoneelse has modifyed the selected Object
+            if(pos != lastpos)
+            {
+                //Adapt Slider
+                setSelectedObject(selectedObject);
+            }
+
             selectedObject.transform.position = new Vector3(sliderX.value, sliderY.value, sliderZ.value);
-            
+            lastpos = selectedObject.transform.position;
+
+            //You have modifyed the selected Object
+            if(pos != lastpos)
+            {
+                //dings.EditSyncObject(selectedObject);
+            }
         }
 	}
 

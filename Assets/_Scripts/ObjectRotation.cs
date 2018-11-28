@@ -16,12 +16,23 @@ public class ObjectRotation : MonoBehaviour
     public Slider sliderX = null;
     public Slider sliderY = null;
     public Slider sliderZ = null;
-	
-	// Update is called once per frame
-	void Update ()
+
+    private Vector3 lastrot;
+
+    // Update is called once per frame
+    void Update ()
     {
         if(selectedObject != null)
         {
+            Vector3 rot = selectedObject.transform.rotation.eulerAngles;
+
+            //Check if someoneelse has modifyed the selected Object
+            if (rot != lastrot)
+            {
+                //Adapt Slider
+                setSelectedObject(selectedObject);
+            }
+
             selectedObject.transform.rotation = Quaternion.Euler(sliderX.value, sliderY.value, sliderZ.value);
 
         }
